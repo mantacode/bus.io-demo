@@ -2,12 +2,13 @@ EventEmitter = require('events').EventEmitter
 Message = require('bus.io-common').Message
 request = require('supertest')
 http = require('http')
-busio = require('bus.io')
 driver = require('bus.io-driver')
 
-describe 'the app', ->
+describe.only 'the app', ->
 
-  Given -> @app = require './../app'
+  Given -> @app = require './../app', {}
+  Given -> @sock = new EventEmitter
+  Given -> @sock.id = 1
   
   describe 'should be an http.Server', ->
 
@@ -25,7 +26,7 @@ describe 'the app', ->
 
     Given -> @bus = @app.bus
 
-    describe 'supports these messages', ->
+    describe 'supports message', ->
 
       describe 'chat', ->
 
@@ -41,12 +42,9 @@ describe 'the app', ->
                 done()
         Then -> expect(@msg.target()).toBe 'everyone'
           
-     describe 'alias a socket to "everyone"', ->
+    describe 'alias a socket to "everyone"', ->
 
-       Given -> @sock = new EventEmitter
-       Given -> @sock.id = 1
-       Given -> spyOn(@bus.io(), 'emit').andCallThrough()
-       Given -> spyOn @bus, 'alias'
-       When -> @bus.io().emit 'connection', @sock
-       Then -> expect(@app.bus.alias).toHaveBeenCalledWith @sock, 'everyone'
-
+      Given -> spyOn(@bus.io(), 'emit').andCallThrough()
+      Given -> spyOn @bus, 'alias'
+      When -> @bus.io().emit 'connection', @sock
+      Then -> expect(@app.bus.alias).toHaveBeenCalledWith @sock, 'everyone'

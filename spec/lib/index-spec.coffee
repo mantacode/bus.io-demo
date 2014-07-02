@@ -1,6 +1,6 @@
 describe 'lib', ->
   
-  Given -> @lib = requireSubject 'lib', {
+  Given -> @lib = requireSubject './../../lib', {
     './../package.json':
       version: 1
   }
