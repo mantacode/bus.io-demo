@@ -2,7 +2,7 @@ EventEmitter = require('events').EventEmitter
 
 describe 'the server', ->
 
-  describe 'the master process', ->
+  describe 'master process', ->
 
     Given -> @cluster = new EventEmitter
     Given -> @cluster.fork = ->
@@ -25,9 +25,12 @@ describe 'the server', ->
       Then -> expect(@cluster.on).toHaveBeenCalledWith 'exit', jasmine.any(Function)
       And -> expect(@cluster.fork).toHaveBeenCalled()
 
-  describe 'the child process', ->
+  describe 'child process', ->
 
-    Given -> @app = listen: ->
+    Given -> @app =
+      app:
+        get: -> 3000
+      listen: ->
     Given -> spyOn @app, 'listen'
 
     Given ->
