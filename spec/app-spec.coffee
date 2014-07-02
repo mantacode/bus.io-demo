@@ -3,7 +3,7 @@ request = require('supertest')
 http = require('http')
 busio = require('bus.io')
 
-describe.only 'the app', ->
+describe 'the app', ->
 
   Given -> @app = require './../app'
   
