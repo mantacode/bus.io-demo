@@ -7,6 +7,9 @@ app.use(express.static(__dirname + '/public'));
 var server = require('http').Server(app);
 
 var bus = require('bus.io')(server);
+bus.socket(function (sock) {
+  bus.alias(sock, 'everyone');
+});
 bus.in(function (msg, sock, next) {
   msg.target('everyone');
   next();

@@ -21,22 +21,32 @@ describe 'the app', ->
 
     Then -> expect(@app.bus instanceof require('bus.io').Server).toBe true
 
-  describe 'supports these messages', ->
+  describe 'bus', ->
 
     Given -> @bus = @app.bus
 
-    describe 'chat', ->
+    describe 'supports these messages', ->
 
-      Given -> @msg = Message().action('chat')
-      When (done) ->
-        driver(@bus)
-          .in(@msg)
-          .done (err, msg) ->
-            if err?
-              done err
-            else
-              @res = msg
-              done()
-      Then -> expect(@msg.target()).toBe 'everyone'
-        
+      describe 'chat', ->
+
+        Given -> @msg = Message().action('chat')
+        When (done) ->
+          driver(@bus)
+            .in(@msg)
+            .done (err, msg) ->
+              if err?
+                done err
+              else
+                @res = msg
+                done()
+        Then -> expect(@msg.target()).toBe 'everyone'
+          
+     describe 'alias a socket to "everyone"', ->
+
+       Given -> @sock = new EventEmitter
+       Given -> @sock.id = 1
+       Given -> spyOn(@bus.io(), 'emit').andCallThrough()
+       Given -> spyOn @bus, 'alias'
+       When -> @bus.io().emit 'connection', @sock
+       Then -> expect(@app.bus.alias).toHaveBeenCalledWith @sock, 'everyone'
 
