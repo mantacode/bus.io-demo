@@ -1,4 +1,4 @@
-describe.only 'service', ->
+describe 'service', ->
 
   Given -> @http = jasmine.createSpyObj 'http', ['Server']
   Given -> @server = ->
