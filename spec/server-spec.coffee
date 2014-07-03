@@ -27,18 +27,18 @@ describe 'the server', ->
 
   describe 'child process', ->
 
-    Given -> @app =
+    Given -> @service =
       app:
         get: -> 3000
       listen: ->
-    Given -> spyOn @app, 'listen'
+    Given -> spyOn @service, 'listen'
 
     Given ->
       @server = requireSubject 'server', {
         cluster: isMaster: false
-        './app': @app
+        './service': @service
       }
 
     describe 'should call listen', ->
 
-      Then -> expect(@app.listen).toHaveBeenCalledWith jasmine.any(Number), jasmine.any(Function)
+      Then -> expect(@service.listen).toHaveBeenCalledWith jasmine.any(Number), jasmine.any(Function)

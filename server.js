@@ -6,8 +6,8 @@ if (cluster.isMaster) {
   return;
 }
 
-var server = require('./app');
-server.listen(server.app.get('port'), function (err) {
+var service = require('./service');
+service.listen(server.app.get('port'), function (err) {
   if (err) {
     console.error(err);
     return process.exit(1);

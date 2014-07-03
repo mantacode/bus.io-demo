@@ -4,7 +4,7 @@ request = require('supertest')
 driver = require('bus.io-driver')
 http = require('http')
 
-describe.only 'the service', ->
+xdescribe 'the service', ->
 
   Given -> @eapp = jasmine.createSpyObj 'app', ['set', 'use']
   Given -> @express  = jasmine.createSpy('express').andReturn @eapp

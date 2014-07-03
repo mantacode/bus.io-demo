@@ -48,3 +48,5 @@ bus.target(function (sock, params, cb) { cb(null, 'everyone') });
 
 server.app = app;
 server.bus = bus;
+
+debug('loaded');
