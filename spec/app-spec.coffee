@@ -12,7 +12,7 @@ describe.only 'the service', ->
   Given -> @expressSession = jasmine.createSpy('express-session').andReturn @esession
   Given -> @estatic = jasmine.createSpy 'static'
   Given -> @express.static = jasmine.createSpy('static').andReturn @estatic
-  Given -> @bus = jasmine.createSpyObj 'bus', ['use','in','on','out','actor','target', 'alias','unalias']
+  Given -> @bus = jasmine.createSpyObj 'bus', ['use','in','on','out','actor','target']
   Given -> @busio = jasmine.createSpy('bus.io').andReturn @bus
   Given -> @bsession = jasmine.createSpy 'session'
   Given -> @bsession.config = {}
@@ -28,6 +28,7 @@ describe.only 'the service', ->
   Given -> @sock = jasmine.createSpyObj 'sock', ['emit']
   Given -> @sock.id = 1
   Given -> @cb = jasmine.createSpy 'cb'
+  Given -> @target = 'everyone'
 
   describe 'is an http.Server', ->
 
@@ -84,9 +85,31 @@ describe.only 'the service', ->
 
     describe 'target function calls back with "everyone"', ->
 
-      Given -> @bus.target = (sock, params, cb) -> cb null, 'everyone'
+      Given -> @bus.target = (sock, params, cb) => cb null, @target
       When -> @bus.target @sock, {}, @cb
-      Then -> expect(@cb).toHaveBeenCalledWith null, 'everyone'
+      Then -> expect(@cb).toHaveBeenCalledWith null, @target
+###
+    describe 'supports incomming message', ->
+
+      describe '"chat"', ->
+
+        Given -> @action = 'chat'
+        Given -> @msg = Message().action @action
+        When (done) ->
+          driver(@bus)
+            .in(@msg)
+            .done (err, msg) =>
+              if err?
+                done err
+              else
+                @res = msg
+                done()
+        Then -> expect(@res.target()).toBe @everyone
+        And -> expect(@res.actor()).toBe @sock.id
+        And -> expect(@res.action()).toBe @action
+###
+
+
 
 ### 
 

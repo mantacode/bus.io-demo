@@ -39,6 +39,8 @@ app.use(express.static(__dirname+'/public'));
 
 var server = module.exports = http.Server(function (req, res) { res.writeHead('200').end(); });
 
+var middleware = require('./lib').middleware;
+
 var bus = require('bus.io')(server);
 bus.use(session);
 bus.actor(function (sock, cb) { cb(null, sock.id) });
