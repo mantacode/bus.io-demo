@@ -10,7 +10,7 @@ describe 'the server', ->
     Given -> spyOn @cluster, 'fork'
     Given -> spyOn(@cluster, 'on').andCallThrough()
     Given -> @os = cpus: -> [{},{},{},{}]
-    Given -> @server =  requireSubject 'server', {
+    Given -> @server = requireSubject 'server', {
       cluster: @cluster
       os: @os
     }
