@@ -4,7 +4,7 @@ request = require('supertest')
 driver = require('bus.io-driver')
 http = require('http')
 
-describe.only 'the app', ->
+describe.only 'the service', ->
 
   Given -> @eapp = jasmine.createSpyObj 'app', ['set', 'use']
   Given -> @express  = jasmine.createSpy('express').andReturn @eapp
@@ -25,6 +25,10 @@ describe.only 'the app', ->
     'bus.io-session': @busSession
   }
 
+  Given -> @sock = jasmine.createSpyObj 'sock', ['emit']
+  Given -> @sock.id = 1
+  Given -> @cb = jasmine.createSpy 'cb'
+
   describe 'is an http.Server', ->
 
     Then -> expect(@app instanceof http.Server).toBe true
@@ -33,28 +37,56 @@ describe.only 'the app', ->
 
     Then -> expect(@app.app).toBe @eapp
 
-    describe 'that sets the port', ->
+  describe 'express app', ->
 
-      Then -> expect(@app.app.set).toHaveBeenCalledWith 'port', jasmine.any(Number)
+    Given -> @app = @app.app
 
-    describe 'that uses an express session', ->
+    describe 'sets the port', ->
+
+      Then -> expect(@app.set).toHaveBeenCalledWith 'port', jasmine.any(Number)
+
+    describe 'uses an express session', ->
 
       Then -> expect(@expressSession).toHaveBeenCalledWith @bsession.config
-      And -> expect(@app.app.use).toHaveBeenCalledWith @esession
+      And -> expect(@app.use).toHaveBeenCalledWith @esession
 
     describe 'that uses an express static resource handler', ->
 
       Then -> expect(@express.static).toHaveBeenCalledWith jasmine.any(String)
-      And -> expect(@app.app.use).toHaveBeenCalledWith @estatic
+      And -> expect(@app.use).toHaveBeenCalledWith @estatic
 
   describe 'has a bus', ->
 
     Then -> expect(@app.bus).toBe @bus
 
-    describe 'that uses a session', ->
+  describe 'bus', ->
+
+    Given -> @bus = @app.bus
+
+    describe 'uses a session', ->
 
       Then -> expect(@busSession).toHaveBeenCalled()
-      And -> expect(@app.bus.use).toHaveBeenCalledWith @bsession
+      And -> expect(@bus.use).toHaveBeenCalledWith @bsession
+
+    describe 'sets the actor function', ->
+
+      Then -> expect(@bus.actor).toHaveBeenCalledWith jasmine.any(Function)
+
+    describe 'actor function calls back with the socket.id', ->
+
+      Given -> @bus.actor = (sock, cb) -> cb null, sock.id
+      When -> @bus.actor @sock, @cb
+      Then -> expect(@cb).toHaveBeenCalledWith null, @sock.id
+
+    describe 'sets the target function', ->
+
+      Then -> expect(@bus.target).toHaveBeenCalledWith jasmine.any(Function)
+
+    describe 'target function calls back with "everyone"', ->
+
+      Given -> @bus.target = (sock, params, cb) -> cb null, 'everyone'
+      When -> @bus.target @sock, {}, @cb
+      Then -> expect(@cb).toHaveBeenCalledWith null, 'everyone'
 
 ### 
 

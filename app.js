@@ -41,6 +41,8 @@ var server = module.exports = http.Server(function (req, res) { res.writeHead('2
 
 var bus = require('bus.io')(server);
 bus.use(session);
+bus.actor(function (sock, cb) { cb(null, sock.id) });
+bus.target(function (sock, params, cb) { cb(null, 'everyone') });
 
 server.app = app;
 server.bus = bus;
